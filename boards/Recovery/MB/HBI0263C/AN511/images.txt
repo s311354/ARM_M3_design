@@ -1,0 +1,24 @@
+TITLE: Versatile Express Images Configuration File
+
+[IMAGES]
+TOTALIMAGES: 1                     ;Number of Images (Max: 32)
+
+IMAGE0ADDRESS: 0x00000000          ;Please select the required executable program
+IMAGE0FILE: \SOFTWARE\st_m3ds.axf   ; - Cortex-M3 DesignStart selftest
+
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\apb_mux.axf  ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\dhry.axf     ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\dtest_m3.axf ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\dualtime.axf ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\gpio_drv.axf ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\gpio_tst.axf ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\hello.axf    ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\int_demo.axf ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\mem_test.axf ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\self_rst.axf ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\sleep.axf    ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\timerdrv.axf ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\timertst.axf ; mps2 version of simulation test
+;IMAGE0FILE: \SOFTWARE\cm3ds_tc\watchdog.axf ; mps2 version of simulation test
+
+

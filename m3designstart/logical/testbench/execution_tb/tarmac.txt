@@ -1,0 +1,297 @@
+
+ The confidential and proprietary information contained in this file may
+ only be used by a person authorised under and to the extent permitted
+ by a subsisting licensing agreement from ARM Limited.
+
+            (C) COPYRIGHT 2002-2010 ARM Limited.
+                ALL RIGHTS RESERVED
+
+ This entire notice must be reproduced on all copies of this file
+ and copies of this file may only be made by a person if such person is
+ permitted to do so under the terms of a subsisting license agreement
+ from ARM Limited.
+
+      RCS Information
+
+      RCS Filename : $RCSfile: tarmac.txt,v $
+
+      Checked In   : $Date: 2006-10-25 16:41:00 +0100 (Wed, 25 Oct 2006) $
+
+      Revision     : $Revision: 41708 $
+
+
+--------------------------------------------------------------------------------
+TARMAC TRACE FILE FORMAT
+--------------------------------------------------------------------------------
+
+Contents:
+
+        1.      About this Text
+        2.      References
+        3.      Terms and Abbreviations
+        4.      Introduction
+        5.      Instruction Trace Format
+        6.      Register Trace Format
+        7.      Event Trace Format
+        8.      Bus Trace Format
+        9.      Memory Trace Format
+
+--------------------------------------------------------------------------------
+1. ABOUT THIS TEXT
+--------------------------------------------------------------------------------
+
+This text outlines the file format produced by the tarmac tracing module
+optionally instantiated in both the Verilog(TM) RTL and DSM implementations of
+this ARM core.
+
+--------------------------------------------------------------------------------
+2. REFERENCES
+--------------------------------------------------------------------------------
+
+This text refers to the following documents:
+
+        Ref:    Doc No:         Author:         Title:
+
+        1.      ARM DDI 0403D   ARM Limited             ARM®v7-M Architecture Reference
+                                                                Manual
+
+
+--------------------------------------------------------------------------------
+3. TERMS AND ABBREVIATIONS
+--------------------------------------------------------------------------------
+
+This document uses the following terms and abbreviations:
+
+        Term:           Meaning:
+
+        ADS             ARM Developer Suite
+        Armulator       The ARM Instruction Set Simulator
+        ISS             Instruction Set Simulator
+        TARMAC          Trace ARM Accesses
+
+--------------------------------------------------------------------------------
+4. INTRODUCTION
+--------------------------------------------------------------------------------
+
+This document outlines the format of the tarmac trace file (tarmac.log) produced
+by either the instantiation of the tarmac toplevel verilog modules, or by
+enabling executed instruction tracing in the equivalent DSM. The format contains
+five different trace types, as follows:
+
+1.      Lines beginning with an "I" are instruction trace lines. These lines
+        contain information regarding whether the instruction was conditionally
+        failed, the instruction address, the hexadecimal encoding of the
+        instruction, and optionally the dissasembled OP code.
+
+2.      Lines beginning with an "R" are register trace lines. These lines
+        contain information regarding changes to the currently visible register
+        bank, including the xPSR. Refer to [1] for a description of the xPSR.
+
+3.      Lines beginning with an "E" are event trace lines. These lines
+        are used to indicate the occurence of events such as an IRQ or
+        undefined instruction trap.
+
+4.      Lines beginning with an "M" are core bus accesses. These lines trace
+        data transfers between the core, prefetch-unit and load-store-unit.
+        They contain information regarding address, data value and data size.
+
+5.      Lines beginning with a "B" are external AHB bus accesses. These lines
+        trace information regarding AHB activity, including cotrol signals,
+        data and address information.
+
+The following sections describe the tarmac implementation of each of the five
+trace formats in more detail.
+
+--------------------------------------------------------------------------------
+5. INSTRUCTION TRACE FORMAT
+--------------------------------------------------------------------------------
+
+The tarmac instruction trace produces the following "tarmac.log" entries:
+
+        <time> <scale> [IT|IS|IF|IE|IA] (<tag>) <addr> <opcode> [T16|T32|X] <instr>
+
+Where:
+        <time>          gives the simulation time
+        <scale>         gives the simulation timescale unit
+        IT              indicates that the instruction was taken
+        IS              indicates that the instruction was skipped
+        IF              indicates a folded instruction
+        IE              indicates a prefetch faulted instruction
+        IA              indicates an instruction executed when the T bit is clear
+                         (so is notionally in 'ARM' state)
+        <tag>           unique identifier; consists of the address of the
+                         instruction, and an instruction count
+        <addr>          indicates the instruction address in hexadecimal format
+        <opcode>        gives the instruction's opcode in hexadecimal format
+        T16             indicates that the instruction was a 16bit THUMB instruction
+        T32             indicates that the instruction was a 32bit THUMB instruction
+        X               indicates that the instruction was unknown
+        <instr>         instruction assembly code
+
+Purpose:
+        Produces an executed instruction trace for Thumb (16 and 32bit).
+
+Examples:
+        THUMB 16bit "CMP" instruction located at address 0x7e8, taken at time
+        315760ns:
+
+     315760 ns IT (000007e8:0000247c) 000007e8     2900 T16 CMP      r1,#0
+
+Notes:
+        All items are separated by arbitrary white space, including <time> from
+        the left margin.
+
+--------------------------------------------------------------------------------
+6. REGISTER TRACE FORMAT
+--------------------------------------------------------------------------------
+
+The tarmac register trace produces the following "tarmac.log" entries:
+
+        <time> <scale> R <register> <value>
+
+Where:
+        <time>          gives the simulation time
+        <scale>         gives the simulation timescale unit
+        R               indicates that this is a register format line
+        <register>      gives the register name
+        <value>         gives the hexadecimal value written to the register
+
+Purpose:
+        Traces changes in all programmers' model registers including PSRs.
+
+Examples:
+        Value 10 decimal written to r9 at 12ns:
+
+                12 ns R r9 0000000a
+
+Notes:
+        All items are separated by arbitrary white space, including <time> from
+        the left margin.
+
+        All writes (not just changes) are recorded in the tarmac.log file.
+
+        The program counter (r15) is not classed as a register for the purpose
+        of the "R" type lines. The PC value can be obtained from the
+        instruction trace lines.
+
+--------------------------------------------------------------------------------
+7. EVENT TRACE FORMAT
+--------------------------------------------------------------------------------
+
+The tarmac event trace produces the following "tarmac.log" entries:
+
+        <time> <scale> E <desc>
+
+Where:
+        <time>          gives the simulation time
+        <scale>         gives the simulation timescale unit
+        E               indicates that this is an event format line
+        <desc>          field containing event name
+
+Purpose:
+        Provides a means of providing information not covered by any of the
+        other trace formats.
+
+Examples:
+        Reset at time 4000ns:
+
+                4000 ns E Reset
+
+        HardFault at time 5000ns:
+
+                5000 ns E HardFault
+
+Notes:
+        All items are separated by arbitrary white space, including <time> from
+        the left margin.
+
+--------------------------------------------------------------------------------
+8. BUS TRACE FORMAT
+--------------------------------------------------------------------------------
+
+The tarmac bus trace produces the following "tarmac.log" entries:
+
+        <time> <scale> B<sn><rw><sz><od><lk><sp><pt> <addr> <data>
+
+Where:
+        <time>          gives the simulation time
+        <scale>         gives the simulation timescale unit
+        B               indicates that this is an AHB bus event line
+        <sn>            S = sequential access, N = non-sequential access
+        <rw>            R = read, W = write
+        <sz>            number indicating multiples of bytes being transfered
+        <od>            O = opcode fetch, _ = data transfer
+        <lk>            L = locked transfer, _ = normal transfer
+        <sp>            S = speculative access, _ = normal access
+        <pt>            I = ISide Bus, D = DSide Bus, S = System Bus
+        <addr>          HADDR value
+        <data>          upto the least significant 32-bits transfered
+
+Purpose:
+        Allows tracing of data entering and exiting the core via AHB.
+
+Examples:
+        Possible reset sequence for normal vector tables:
+
+                 100 ns BNR4___I 00000000 00000a44
+                 110 ns BNR4___I 00000004 0000083b
+                 140 ns BNR4O__I 00000838 f0018800
+
+        Write of character "t" to TUBE (address 0x00400000) at 830ns:
+
+                 830 ns BNW1___D 00400000 74
+
+        Write of value 0x00000000 to address 0x203ffff8 on the System Bus:
+
+                3750 ns BNW4___S 203ffff8 00000000
+
+Notes:
+        All items are separated by arbitrary white space, including <time> from
+        the left margin.
+
+        Not all of the control fields may be fully monitored for a particular
+        implementation e.g. <sp> will always return "_" for this version.
+
+--------------------------------------------------------------------------------
+9. MEMORY TRACE FORMAT
+--------------------------------------------------------------------------------
+
+The tarmac memory trace produces the following "tarmac.log" entries:
+
+      <time> <scale> M<sn><rw><sz><od><lk><sp><pt>  <addr> <data>
+
+Where:
+        <time>          gives the simulation time
+        <scale>         gives the simulation timescale unit
+        M               indicates that this is an AHB bus event line
+        <sn>            S = sequential access, N = non-sequential access
+        <rw>            R = read, W = write
+        <sz>            number indicating multiples of bytes being transfered
+        <od>            O = opcode fetch, _ = data transfer
+        <lk>            L = locked transfer, _ = normal transfer
+        <sp>            S = speculative access, _ = normal access
+        <pt>            A = AP Bus, D = DSide Bus, I = ISide Bus
+        <addr>          address value
+        <data>          data value
+
+Purpose:
+        Allows tracing of data passing between the core and LSU
+
+Examples:
+        Write character "t" to TUBE (address 0x00400000) at 1000ns:
+
+                 830 ns MNW1___D 00400000 74
+
+Notes:
+        All items are separated by arbitrary white space, including <time> from
+        the left margin.
+
+        Not all of the control fields may be fully monitored for a particular
+        implementation e.g. <sp> will always return "_" for this version.
+
+        AP bus refers to Debug Access Port accesses that a debug agent may be
+        performing.
+
+        <lk>, <sp> have not been implemented. Both display "_".
+
+--------------------------------------------------------------------------------

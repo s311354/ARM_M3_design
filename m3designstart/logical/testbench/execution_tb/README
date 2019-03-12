@@ -1,0 +1,40 @@
+//-----------------------------------------------------------------------------
+// The confidential and proprietary information contained in this file may
+// only be used by a person authorised under and to the extent permitted
+// by a subsisting licensing agreement from ARM Limited or its affiliates.
+//
+//        (C) COPYRIGHT 2017 ARM Limited or its affiliates.
+//            ALL RIGHTS RESERVED
+//
+// This entire notice must be reproduced on all copies of this file
+// and copies of this file may only be made by a person if such person is
+// permitted to do so under the terms of a subsisting license agreement
+// from ARM Limited or its affiliates.
+//
+//  Version and Release Control Information:
+//
+//  File Revision       : $Revision: 365966 $
+//  File Date           : $Date: 2016-09-20 14:36:51 +0100 (Tue, 20 Sep 2016) $
+//
+//  Release Information : CM3DesignStart-r0p0-02rel0
+//
+//-----------------------------------------------------------------------------
+// Purpose : Cortex M3 DesignStart Eval simulation testbench README
+//-----------------------------------------------------------------------------
+
+
+This directory provides a testbench for integration tests (including RAM
+integration) for Cortex-M3 DesignStart Eval.
+
+Please see the following documentation for details on running tests:
+
+ARM Cortex-M3 DesignStart Eval RTL and FPGA Quick Start Guide
+        This document demonstrates the basic steps to using the
+        Cortex M3 DesignStart Eval system.
+
+ARM Cortex-M3 DesignStart Eval RTL and Testbench User Guide
+        This document describes the example system which is
+        provided as part of Cortex-M3Designstart Eval.
+        The chapter 'Simulation and integration tests' covers
+        the tests which you can run in this directory.
+

@@ -1,0 +1,28 @@
+; *************************************************************
+; *** Scatter-Loading Description File                      ***
+; *************************************************************
+
+LR_IROM1 0x00000000  
+{ 
+  ER_IROM1 +0    ; load address = execution address
+  {
+   *.o (RESET, +First)
+   *(InRoot$$Sections)
+   .ANY (+RO)
+  }
+  ; Place stack/heap in the code region to allow ram tests to run
+  RW_IRAM1 +0     ; RW data
+  { 
+   .ANY (+RW +ZI)
+  }  
+ }
+ 
+LR_IROM2 0x00400000  
+{ 
+
+  ER_IROM2 +0    
+  {
+   flyer.o
+   intro.o
+  }
+}

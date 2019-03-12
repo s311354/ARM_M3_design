@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<ProjectWorkspace xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="project_mpw.xsd">
+
+  <SchemaVersion>1.0</SchemaVersion>
+
+  <Header>### uVision Project, (C) Keil Software</Header>
+
+  <WorkspaceName>WorkSpace</WorkspaceName>
+
+  <project>
+    <PathAndName>..\hello\hello.uvprojx</PathAndName>
+    <NodeIsActive>1</NodeIsActive>
+  </project>
+
+  <project>
+    <PathAndName>..\apb_mux_tests\apb_mux_tests.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\cxdt\cxdt.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\default_slaves_tests\default_slaves_tests.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\designtest_m3\designtest_m3.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\dhry\dhry.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\dualtimer_demo\dualtimer_demo.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\gpio_driver_tests\gpio_driver_tests.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\gpio_tests\gpio_tests.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\interrupt_demo\interrupt_demo.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\memory_tests\memory_tests.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\self_reset_demo\self_reset_demo.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\sleep_demo\sleep_demo.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\timer_driver_tests\timer_driver_tests.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\timer_tests\timer_tests.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\uart_driver_tests\uart_driver_tests.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\uart_tests\uart_tests.uvprojx</PathAndName>
+  </project>
+
+  <project>
+    <PathAndName>..\watchdog_demo\watchdog_demo.uvprojx</PathAndName>
+  </project>
+
+</ProjectWorkspace>

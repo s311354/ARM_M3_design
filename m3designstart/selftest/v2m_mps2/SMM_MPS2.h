@@ -199,7 +199,7 @@ typedef struct                   // Document DDI0194G_ssp_pl022_r1p3_trm.pdf
 #define SSP_CR0_DSS_Pos         0           // Data Size Select
 #define SSP_CR0_DSS_Msk         (0xF<<SSP_CR0_DSS_Pos)
 #define SSP_CR0_FRF_Pos         4           // Frame Format Select
-#define SSP_CR0_FRF_Msk         (3UL<<SSP_CR0_FRM_Pos)
+#define SSP_CR0_FRF_Msk         (3UL<<SSP_CR0_FRF_Pos)
 #define SSP_CR0_SPO_Pos         6           // SSPCLKOUT polarity
 #define SSP_CR0_SPO_Msk         (1UL<<SSP_CR0_SPO_Pos)
 #define SSP_CR0_SPH_Pos         7           // SSPCLKOUT phase
@@ -236,7 +236,7 @@ typedef struct                   // Document DDI0194G_ssp_pl022_r1p3_trm.pdf
 
 // SSP_CPSR Clock prescale register
 #define SSP_CPSR_CPD_Pos        0           // Clock prescale divisor
-#define SSP_CPSR_CPD_Msk        (0xFF<<SSP_CPSR_CDP_Pos)
+#define SSP_CPSR_CPD_Msk        (0xFF<<SSP_CPSR_CPD_Pos)
 
 #define SSP_CPSR_DFLT        0x0008      // Clock prescale (use with SCR), default set at 8
 

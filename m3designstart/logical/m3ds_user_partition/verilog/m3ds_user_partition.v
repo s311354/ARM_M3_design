@@ -1975,6 +1975,26 @@ module m3ds_user_partition (
 );
 
 
+`ifdef M3DS_PCIE_HOST
+  m3ds_pcie_host_wrapper u_m3ds_pcie_host_wrapper (
+   // Inputs
+    .HCLK         (CPU0HCLK),          // Clock
+    .HRESETn      (CPU0SYSRESETn),     // Reset
+    .HSEL         (targexp0hsel),      // Slave seclect
+    .HADDR        (targexp0haddr),
+    .HTRANS       (targexp0htrans),    // Transfer type   
+    .HWRITE       (targexp0hwrite),
+    .HSIZE        (targexp0hsize),
+
+    .HWDATA       (targexp0hwdata),
+    .HREADY       (targexp0hreadymux), // System ready
+
+   // Outputs
+    .HRDATA       (targexp0hrdata),
+    .HREADYOUT    (targexp0hreadyout), // Slave ready
+    .HRESP        (targexp0hresp));    // Slave response
+
+`else
 
   // --------------------------------------------------------------------
   // Default Slave for AHB Expansion master port
@@ -1993,8 +2013,12 @@ module m3ds_user_partition (
     .HRESP        (targexp0hresp));    // Slave response
 
   assign   targexp0hrdata = 32'h00000000;
+
+`endif
+
   assign   targexp0exresp = 1'b0;
   assign   targexp0hruser = {3{1'b0}};
+ 
 
   // --------------------------------------------------------------------
   // System Control

@@ -132,7 +132,7 @@ int main(void) {
 
     return 0;
 
-ed:
+failed:
     printf("LABH1 PCIe HOST FAIL\n");
     printf("** TEST FAILED **\n");
 

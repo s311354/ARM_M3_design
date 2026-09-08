@@ -115,9 +115,10 @@ ifeq ($(strip $(FSDB)), yes)
     MTI_NOVAS_OPTS    := -pli $$VERDI_HOME/share/PLI/MODELSIM/LINUX/novas_fli.so
   endif
 endif
-MTI_DO_RUN_SCRIPT     := "radix hex; run ${MAX_SIMULATION_TIME};quit -f"
-MTI_VLOG_COMPILE_OPTS := +define+MTI_BUILD +acc=blnr -noincr
-MTI_VLOG_RUN_OPTS     := -quiet -assertdebug -voptargs="+acc=blnr" ${MTI_NOVAS_OPTS} ${VLOG_TESTBENCH_NAME}
+MTI_DO_RUN_SCRIPT     := run_sim.tcl
+# Optimized for speed: Changed +acc=blnr to +acc=n (no debug access for faster sim)
+MTI_VLOG_COMPILE_OPTS := +define+MTI_BUILD +acc=n -noincr
+MTI_VLOG_RUN_OPTS     := -quiet -voptargs="+acc=n" ${MTI_NOVAS_OPTS} ${VLOG_TESTBENCH_NAME}
 MTI_CM_COMPILE_OPTS   := ${MTI_VLOG_COMPILE_OPTS} -ccflags ${CFLAGS}
 MTI_CM_RUN_OPTS       := ${MTI_VLOG_RUN_OPTS}
 
@@ -362,6 +363,11 @@ endif
   cp -f ../integration_cssoc/validation/bin/$(CXDT)/CXDT.bin . ; \
   od -v -A n -t x8 --width=16 ../testcodes/$(TESTNAME)/$(TESTNAME).bin | awk '{print $$2$$1}' > $(EXE_TB_DIR)/flash_main.ini ; \
   echo "run ${MAX_SIMULATION_TIME}" > run.tcl ; \
+  echo "radix hex" > run_sim.tcl ; \
+  echo "onbreak {quit -code 0}" >> run_sim.tcl ; \
+  echo "onerror {quit -code 1}" >> run_sim.tcl ; \
+  echo "run ${MAX_SIMULATION_TIME}" >> run_sim.tcl ; \
+  echo "quit -f" >> run_sim.tcl ; \
 	touch image.hex
 	@echo " >> Running testbench with $(SIMULATOR) and DSM=$(DSM)"
 	$(RUN_LINE)

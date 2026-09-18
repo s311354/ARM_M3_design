@@ -403,6 +403,25 @@ module m3ds_user_partition (
   wire          targexp1exresp;
   wire [2:0]    targexp1hruser;
 
+
+  // H3 TARGEXP1 sub-decode (0x60000000 - 0x6FFFFFFF)
+  wire          periphhsel;
+
+  wire [31:0]   periphhrdata;
+  wire          periphhreadyout;
+  wire          periphhresp;
+
+`ifdef M3DS_PCIE_H3
+  wire          pcie_mmio_hsel;
+
+  wire [31:0]   pcie_mmio_hrdata;
+  wire          pcie_mmio_hreadyout;
+  wire          pcie_mmio_hresp;
+
+  reg           targexp1_pcie_dphase; // AHB response ownership
+
+`endif
+
   // expansion AHB slave input (tied off by default)
   wire          initexp0hsel;
   wire  [31:0]  initexp0haddr;
@@ -1547,7 +1566,7 @@ module m3ds_user_partition (
   //-----------------------------
   //AHB interface
   //AHB Master Slave
-    .PERIPHHSEL_i           (targexp1hsel ),       //AHB peripheral select
+    .PERIPHHSEL_i           (periphhsel ),       //AHB peripheral select
     .PERIPHHREADYIN_i       (targexp1hreadymux ),  //AHB ready input
     .PERIPHHTRANS_i         (targexp1htrans ),     //AHB transfer type
     .PERIPHHSIZE_i          (targexp1hsize ),      //AHB hsize
@@ -1557,9 +1576,9 @@ module m3ds_user_partition (
 
     .PERIPHHPROT_i          (targexp1hprot ),
 
-    .PERIPHHREADYMUXOUT_o   (targexp1hreadyout ),  //AHB ready output from S->M mux
-    .PERIPHHRESP_o          (targexp1hresp ),      //AHB response output from S->M mux
-    .PERIPHHRDATA_o         (targexp1hrdata ),     //AHB read data from S->M mux
+    .PERIPHHREADYMUXOUT_o   (periphhreadyout ),  //AHB ready output from S->M mux
+    .PERIPHHRESP_o          (periphhresp ),      //AHB response output from S->M mux
+    .PERIPHHRDATA_o         (periphhrdata ),     //AHB read data from S->M mux
 
     .AHBPER0_REG            (ahbper0_reg), // access permission for gpio
     .APBPER0_REG            (apbper0_reg), // access permission for apb peripherals
@@ -1974,13 +1993,86 @@ module m3ds_user_partition (
 
 );
 
+  // --------------------------------------------------------------------
+  // PCIe Host integration
+  // --------------------------------------------------------------------
+ `ifdef M3DS_PCIE_H3
+    assign pcie_mmio_hsel = targexp1hsel && (targexp1haddr[31:28] == 4'h6);
+    assign periphhsel = targexp1hsel && (targexp1haddr[31:28] != 4'h6);
 
-`ifdef M3DS_PCIE_HOST
+    assign targexp1hrdata = targexp1_pcie_dphase ? pcie_mmio_hrdata : periphhrdata;
+    assign targexp1hreadyout = targexp1_pcie_dphase ? pcie_mmio_hreadyout : periphhreadyout;
+    assign targexp1hresp = targexp1_pcie_dphase ? pcie_mmio_hresp : periphhresp;
+
+    // TARGEXP1 AHB data-phase ownership
+    // Capture which local TARGEXP1 slave accepted the address phase
+    always @(posedge CPU0HCLK or negedge CPU0SYSRESETn)
+      begin
+      if (!CPU0SYSRESETn) 
+        begin
+	  targexp1_pcie_dphase <= 1'b0;
+        end
+      else if (targexp1hreadymux)
+	begin
+	  targexp1_pcie_dphase <= targexp1hsel && targexp1htrans[1] && (targexp1haddr[31:28] == 4'h6);
+	end
+      end
+
+ `else
+    assign pcie_mmio_hsel    = 1'b0;
+    assign periphhsel        = targexp1hsel;
+
+    assign targexp1hrdata    = periphhrdata;
+    assign targexp1hreadyout = periphhreadyout;
+    assign targexp1hresp     = periphhresp;
+
+ `endif
+
+
+`ifdef M3DS_PCIE_H3
+  labh3_pcie_root_port_wrapper u_labh3_pcie_root_port_wrapper (
+   // Inputs
+    .HCLK         (CPU0HCLK),
+    .HRESETn      (CPU0SYSRESTn),
+
+    // TARGEXP0 PCIe Host Controller CSR / Configuration path
+    .CSR_HSEL     (targexp0hsel),       // Slave select
+    .CSR_HADDR    (targexp0haddr),
+    .CSR_HTRANS   (targexp0htrans),     // Transfer type
+    .CSR_HWRITE   (targexp0hwrite),
+    .CSR_HSIZE    (targexp0hsize),
+
+    .CSR_HWDATA   (targexp0hwdata),
+    .CSR_HREADY   (targexp0hreadymux),  // System ready
+
+  // Outputs
+    .CSR_HRDATA   (targexp0hrdata),
+    .CSR_HREADYOUT(targexp0hreadyout),  // Slave ready
+    .CSR_HRESP    (targexp0hresp),      // Slave response
+    
+    // TARGEXP1 PCIe outbound MMIO aperture only
+  // Inputs
+    .MMIO_HSEL    (pcie_mmio_hsel),
+    .MMIO_HADDR   (targexp1haddr),
+    .MMIO_HTRANS  (targexp1htrans),
+    .MMIO_HWRITE  (targexp1hwrite),
+    .MMIO_HSIZE   (targexp1hsize),
+
+    .MMIO_HWDATA  (targexp1hwdata),
+    .MMIO_HREADY  (targexp1hreadymux),
+
+  // Outputs
+    .MMIO_HRDATA    (pcie_mmio_hrdata),
+    .MMIO_HREADYOUT (pcie_mmio_hreadyout),
+    .MMIO_HRESP     (pcie_mmio_hresp)
+  );
+
+`elsif M3DS_PCIE_HOST
   m3ds_pcie_host_wrapper u_m3ds_pcie_host_wrapper (
    // Inputs
     .HCLK         (CPU0HCLK),          // Clock
     .HRESETn      (CPU0SYSRESETn),     // Reset
-    .HSEL         (targexp0hsel),      // Slave seclect
+    .HSEL         (targexp0hsel),      // Slave select
     .HADDR        (targexp0haddr),
     .HTRANS       (targexp0htrans),    // Transfer type   
     .HWRITE       (targexp0hwrite),
